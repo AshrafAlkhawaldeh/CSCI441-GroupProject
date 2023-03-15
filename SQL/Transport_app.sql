@@ -54,30 +54,36 @@ CREATE TABLE Customer (
     Customer_ID INT PRIMARY KEY NOT NULL,
     Customer_First_Name VARCHAR(255) NOT NULL,
     Customer_Last_Name VARCHAR(255) NOT NULL,
-    Company_Name VARCHAR(255) NOT NULL, /* is it a foreign key from the Companies table ? */
-    Branch_Name VARCHAR(255)  NOT NULL, /* is it a foreign key from the Company_Branches table ? */
-    Customer_Contact_No INT  NOT NULL,
-    Customer_Street_Address VARCHAR(255),
-    Customer_City VARCHAR(255),
-    Customer_State VARCHAR(13),
-    Customer_Zip_Code VARCHAR(9)
+    Company_Branch_ID INT NOT NULL, /*added*/
+    Company_Name VARCHAR(255) NOT NULL, /* remove */
+    Branch_Name VARCHAR(255)  NOT NULL,/* remove */
+    Customer_Contact_No INT  NOT NULL,/* remove */
+    Customer_Street_Address VARCHAR(255),/* remove */
+    Customer_City VARCHAR(255),/* remove */
+    Customer_State VARCHAR(13),/* remove */
+    Customer_Zip_Code VARCHAR(9),/* remove */
+    FOREIGN KEY (Company_Branch_ID) REFERENCES Company_Branch(Company_Branch_ID) /*added*/
+
+);
 );
 
 /* All the information related to the invoices*/
 
 CREATE TABLE Job (
     Invoice_ID INT PRIMARY KEY NOT NULL,
-    Job_Date DATE NOT NULL,
     Shipper_ID INT NOT NULL,
     Receiver_ID INT NOT NULL,
     Truck_ID INT NOT NULL,
     Driver_ID INT,
-    Intake_ID INT NOT NULL ,
+    Intake_ID INT NOT NULL , /* is it the Assigner_ID foriegn key*/
     Driver_signature BLOB, 
     Shipper_Signature BLOB,
     Receiver_Signature BLOB,
-    Job_Status ENUM ('Pending','Loading','Enroute','Arrived','Unloaded','Complete'),
-    Total_amount_$ DECIMAL(10,2),
+    Date_of_Order DATE NOT NULL, /* added */
+    Job_Status ENUM ('Pending','Loading','Enroute','Arrived','Unloaded','Complete'), /* remove? */
+    Date_job_completed DATE, /*added*/
+    Job_Special_Instruction VARCHAR(2000), /*added*/
+    Total_amount_$ DECIMAL(10,2), /* remove*/
     FOREIGN KEY (Shipper_ID) REFERENCES Customer(Customer_ID),
     FOREIGN KEY (Receiver_ID) REFERENCES Customer(Customer_ID), /* needs further work incase the shipper and the receiver are not the same*/
     FOREIGN KEY (Truck_ID) REFERENCES Truck(Truck_ID),
@@ -87,7 +93,7 @@ CREATE TABLE Job (
 
 /* Record of payments received */
 CREATE TABLE Payment (
-	Payment_ID INT PRIMARY KEY NOT NULL,
+    Payment_ID INT PRIMARY KEY NOT NULL,
     Invoice_ID INT NOT NULL,
     Payment_Date DATE NOT NULL,
     Payment_Amount DECIMAL(10,2) NOT NULL,
@@ -99,7 +105,8 @@ CREATE TABLE Payment (
 CREATE TABLE Photo_Record (
     Photo_ID INT PRIMARY KEY NOT NULL,
     Car_Line_Item_ID INT  NOT NULL,
-    URL VARCHAR(4096)  NOT NULL,
+    Photo_URL VARCHAR(4096)  NOT NULL,
+    Photo_Note VARCHAR(2000)
     FOREIGN KEY (Car_Line_Item_ID) REFERENCES Car_Line_Item(Car_Line_Item_ID)
 );
 
@@ -116,6 +123,11 @@ CREATE TABLE Company_Branch (
 Company_Branch_ID INT PRIMARY KEY NOT NULL,
 Company_ID INT NOT NULL,
 Branch_Name VARCHAR(255) UNIQUE NOT NULL,
+Branch_Contact_No VARCHAR(20) NOT NULL,
+Branch_Street_Address VARCHAR(255),
+Branch_City VARCHAR(255),
+Branch_State VARCHAR(13),
+Branch_Zip_Code VARCHAR(9)
 FOREIGN KEY (Company_ID) REFERENCES Company(Company_ID)
 );
 
